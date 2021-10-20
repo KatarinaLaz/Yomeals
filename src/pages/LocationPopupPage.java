@@ -4,12 +4,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class LocationPopupPage extends BasicPage {
 
-	public LocationPopupPage(WebDriver driver, JavascriptExecutor js, WebDriverWait waiter) {
-		super(driver, js, waiter);
+	public LocationPopupPage(WebDriver driver, JavascriptExecutor js, WebDriverWait waiter, Actions actionProvider) {
+		super(driver, js, waiter, actionProvider);
 	}
 
 //	METHODS
@@ -20,8 +21,8 @@ public class LocationPopupPage extends BasicPage {
 	
 	public void setLocation(String locationName) {
 		this.getKeyword().click();
-		this.getLocationItem(locationName).getAttribute("data-value");
-		js.executeScript("arguments[0].value=arguments[1]", this.getLocationInput(), this.getLocationItem(locationName).getAttribute("data-value"));
+		String value = this.getLocationItem(locationName).getAttribute("data-value");
+		js.executeScript("arguments[0].value=arguments[1]", this.getLocationInput(), value);
 		js.executeScript("arguments[0].click()", this.getSubmit());
 	}
 	
@@ -36,11 +37,11 @@ public class LocationPopupPage extends BasicPage {
 	}
 	
 	public WebElement getLocationSelectCloseButton() {
-		return this.driver.findElement(By.xpath("//div[@class='location-search']/a"));
+		return this.driver.findElement(By.xpath("//*[@id=\"location-popup\"]/div/div/div/div/a"));
 	}
 	
 	public WebElement getKeyword() {
-		return this.driver.findElement(By.id("locality_keyword"));
+		return this.driver.findElement(By.xpath("//*[@id='locality_keyword']"));
 	}
 	
 	public WebElement getLocationItem(String locationName) {
@@ -48,11 +49,11 @@ public class LocationPopupPage extends BasicPage {
 	}
 	
 	public WebElement getLocationInput() {
-		return this.driver.findElement(By.id("location_id"));
+		return this.driver.findElement(By.xpath("//*[@id='location_id']"));
 	}
 	
 	public WebElement getSubmit() {
-		return this.driver.findElement(By.name("btn_submit"));
+		return this.driver.findElement(By.xpath("//*[@id='frm_fat_id_frmSetLocation']/span/input"));
 	}
 	
 	

@@ -1,34 +1,48 @@
 package pages;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ProfilePage extends BasicPage {
 
-	public ProfilePage(WebDriver driver, JavascriptExecutor js, WebDriverWait waiter) {
-		super(driver, js, waiter);
+	public ProfilePage(WebDriver driver, JavascriptExecutor js, WebDriverWait waiter, Actions actionProvider) {
+		super(driver, js, waiter, actionProvider);
 	}
 	
 //	METHODS
 	
-	public void uploadProfilePicture(String imgSource) {
-		js.executeScript("arguments[0].click()", this.getImageUploadButton());
-		File image = new File(imgSource);
-		String imgPath = image.getAbsolutePath();
-		this.getImageUploadButton().sendKeys(imgPath);
+	public void uploadProfilePicture(String imgName) throws IOException, AWTException, InterruptedException {
+		actionProvider.moveToElement(this.getProfileImgArea()).build().perform();
+		this.getImageUploadButton().click();
+		Thread.sleep(1000);
+		Robot robot = new Robot();
+		robot.keyPress(KeyEvent.VK_ESCAPE);
+		robot.keyRelease(KeyEvent.VK_ESCAPE);
+		String imgPath = new File(System.getProperty("user.dir") + "/img/" + imgName).getAbsolutePath();
+		this.getImageInput();
+		this.getImageInput().sendKeys(imgPath);
+		Thread.sleep(1000);
 	}
 	
-	public void removeProfilePicture() {
-		js.executeScript("arguments[0].click()", this.getImageRemoveButton());
+	public void removeProfilePicture() throws InterruptedException {
+		actionProvider.moveToElement(this.getProfileImgArea()).build().perform();
+		this.getImageRemoveButton().click();
+		Thread.sleep(1000);
 	}
 	
-	public void editUserInfo(String fName, String lName, String address, String phone, String zipCode, String countryName, String stateName, String cityName) {
+	public void editUserInfo(String fName, String lName, String address, String phone, String zipCode,
+			String countryName, String stateName, String cityName) throws InterruptedException {
 		this.getFirstNameInput().clear();
 		this.getFirstNameInput().sendKeys(fName);
 		this.getLastNameInput().clear();
@@ -41,10 +55,12 @@ public class ProfilePage extends BasicPage {
 		this.getZip().sendKeys(zipCode);
 		Select country = new Select(this.getCountrySelect());
 		country.selectByVisibleText(countryName);
+		Thread.sleep(500);
 		Select state = new Select(this.getStateSelect());
 		state.selectByVisibleText(stateName);
 		Select city = new Select(this.getCitySelect());
 		city.selectByVisibleText(cityName);
+		this.getSaveButton().click();
 	}
 		
 	
@@ -59,15 +75,15 @@ public class ProfilePage extends BasicPage {
 	}
 	
 	public WebElement getAddress() {
-		return this.getAddress().findElement(By.name("user_address"));
+		return this.driver.findElement(By.name("user_address"));
 	}
 	
 	public WebElement getPhone() {
-		return this.getAddress().findElement(By.name("user_phone"));
+		return this.driver.findElement(By.name("user_phone"));
 	}
 	
 	public WebElement getZip() {
-		return this.getAddress().findElement(By.name("user_zip"));
+		return this.driver.findElement(By.name("user_zip"));
 	}
 
 	public WebElement getImageUploadButton() {
@@ -75,7 +91,7 @@ public class ProfilePage extends BasicPage {
 	}
 	
 	public WebElement getImageRemoveButton() {
-		return this.getAddress().findElement(By.className("remove"));
+		return this.driver.findElement(By.className("remove"));
 	}
 	
 	public WebElement getCountrySelect() {
@@ -90,7 +106,17 @@ public class ProfilePage extends BasicPage {
 		return this.driver.findElement(By.name("user_city"));
 	}
 	
+	public WebElement getSaveButton() {
+		return this.getAddress().findElement(By.xpath("//*[@id=\"profileInfoFrm\"]/div[5]/div/fieldset/input"));
+	}
 	
+	public WebElement getProfileImgArea() {
+		return this.driver.findElement(By.xpath("//*[@id=\"profileInfo\"]/div/div[1]/img"));
+	}
+	
+	public WebElement getImageInput() {
+		return this.driver.findElement(By.xpath("//*[@id='form-upload']/input"));
+	}
 	
 	
 	
